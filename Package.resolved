@@ -1,0 +1,24 @@
+{
+  "originHash" : "00e49057a2d37a0528f38ff383644121e800e0c2ce0fcf6f1bb76ee63706b8d2",
+  "pins" : [
+    {
+      "identity" : "reasync",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/trevorsheridan/ReAsync.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "0819794c3cf751a407c6e8920db50c315206ab4f"
+      }
+    },
+    {
+      "identity" : "swiftutilities",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/trevorsheridan/SwiftUtilities.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4449c89d826704f7308ccd0e62ded3af896d0fba"
+      }
+    }
+  ],
+  "version" : 3
+}
