@@ -3,13 +3,13 @@
 
 import ReAsync
 
-final class SimpleStore<Value, Provider>: Sendable
+public final class SimpleStore<Value, Provider>: Sendable
 where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == Value {
-    var value: Value? {
+    public var value: Value? {
         sequence.value
     }
     
-    var stream: AnyAsyncSequence<Value?> {
+    public var stream: AnyAsyncSequence<Value?> {
         sequence.eraseToAnyAsyncSequence()
     }
     

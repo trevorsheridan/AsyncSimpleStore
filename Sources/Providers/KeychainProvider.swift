@@ -8,7 +8,7 @@
 import Foundation
 import Utilities
 
-final class KeychainProvider<Value>: StorageProviding
+public final class KeychainProvider<Value>: StorageProviding
 where Value: Codable & Sendable {
     private let identifier: String
     private let prefix: String
@@ -26,14 +26,14 @@ where Value: Codable & Sendable {
         prefix + "." + identifier
     }
     
-    init(identifier: String, prefix: String, encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
+    public init(identifier: String, prefix: String, encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
         self.identifier = identifier
         self.prefix = prefix
         self.encoder = encoder
         self.decoder = decoder
     }
     
-    func read() -> Value? {
+    public func read() -> Value? {
         let query: [String: Any] = query + [
             kSecMatchLimit as String: kSecMatchLimitOne,
             kSecReturnAttributes as String: true,
@@ -61,7 +61,7 @@ where Value: Codable & Sendable {
         }
     }
     
-    func write(value: Value) throws {
+    public func write(value: Value) throws {
         do {
             let attributes = [
                 kSecValueData as String: try encoder.encode(value)
