@@ -23,7 +23,7 @@ let package = Package(
             name: "AsyncSimpleStore",
             dependencies: [
                 .product(name: "Utilities", package: "SwiftUtilities"),
-                .product(name: "ReAsync", package: "ReAsync"),
+                .product(name: "ReactiveAsyncSequences", package: "ReactiveAsyncSequences"),
             ]
         ),
         .testTarget(

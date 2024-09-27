@@ -1,19 +1,28 @@
 {
-  "originHash" : "00e49057a2d37a0528f38ff383644121e800e0c2ce0fcf6f1bb76ee63706b8d2",
+  "originHash" : "56314e1a08b3332bea5285ed72384a928c0cb2e0472fa55a155835aadb507c12",
   "pins" : [
     {
-      "identity" : "reasync",
+      "identity" : "reactiveasyncsequences",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/trevorsheridan/ReAsync.git",
+      "location" : "https://github.com/pfllc/ReactiveAsyncSequences.git",
       "state" : {
         "branch" : "main",
-        "revision" : "0819794c3cf751a407c6e8920db50c315206ab4f"
+        "revision" : "492b24df46074727b03f9fa5744f75155709d9f3"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
       }
     },
     {
       "identity" : "swiftutilities",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/trevorsheridan/SwiftUtilities.git",
+      "location" : "https://github.com/pfllc/SwiftUtilities.git",
       "state" : {
         "branch" : "main",
         "revision" : "4449c89d826704f7308ccd0e62ded3af896d0fba"
