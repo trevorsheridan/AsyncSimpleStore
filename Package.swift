@@ -13,8 +13,8 @@ let package = Package(
             targets: ["AsyncSimpleStore"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/trevorsheridan/SwiftUtilities.git", branch: "main"),
-        .package(url: "https://github.com/trevorsheridan/ReAsync.git", branch: "main"),
+        .package(url: "https://github.com/pfllc/SwiftUtilities.git", branch: "main"),
+        .package(url: "https://github.com/pfllc/ReactiveAsyncSequences.git", branch: "main"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
