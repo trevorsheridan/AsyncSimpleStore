@@ -51,6 +51,18 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
         // logger.log("wrote data to url: \(url)")
     }
     
+    public func destroy() {
+        guard let url = try? url(), FileManager.default.fileExists(atPath: url.path) else {
+            return
+        }
+        
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            // noop
+        }
+    }
+    
     private func url(createOptions: DirectoryCreateOptions = []) throws -> URL {
         let url = try DirectorySupport.url(to: directory, createOptions: createOptions)
         return url.appendingPathComponent(filename)

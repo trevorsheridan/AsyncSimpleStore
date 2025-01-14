@@ -14,6 +14,11 @@ struct SimpleStoreTests {
         #expect(await store.value == 2)
     }
     
+    @Test func delete() async throws {
+        store.destroy()
+        #expect(await store.value == nil)
+    }
+    
     @Test func testSequence() async throws {
         Task {
             for try await value in store.stream {

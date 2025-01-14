@@ -35,4 +35,9 @@ where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == V
         try provider.write(value: value)
         sequence.send(value)
     }
+    
+    public func destroy() {
+        provider.destroy()
+        sequence.send(nil)
+    }
 }

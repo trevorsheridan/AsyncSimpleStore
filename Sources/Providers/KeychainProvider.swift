@@ -84,4 +84,8 @@ where Value: Codable & Sendable {
             throw error
         }
     }
+    
+    public func destroy() {
+        SecItemDelete(query as CFDictionary)
+    }
 }

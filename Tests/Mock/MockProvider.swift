@@ -26,4 +26,10 @@ final class MockProvider<Value>: StorageProviding where Value: Sendable {
             v = value
         }
     }
+    
+    func destroy() {
+        value.withLock { v in
+            v = nil
+        }
+    }
 }

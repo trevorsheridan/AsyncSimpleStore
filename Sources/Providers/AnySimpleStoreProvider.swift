@@ -12,12 +12,14 @@ where Value: Sendable {
     public let provider: any StorageProviding
     private let reader: @Sendable () -> Value?
     private let writer: @Sendable (_ value: Value) throws -> Void
+    private let destroyer: @Sendable () -> Void
     
     public init<Provider>(_ provider: Provider)
     where Provider: StorageProviding, Provider.Value == Value {
         self.provider = provider
         self.reader = provider.read
         self.writer = provider.write
+        self.destroyer = provider.destroy
     }
     
     public func read() -> Value? {
@@ -26,5 +28,9 @@ where Value: Sendable {
     
     public func write(value: Value) throws {
         try writer(value)
+    }
+    
+    public func destroy() {
+        destroyer()
     }
 }
