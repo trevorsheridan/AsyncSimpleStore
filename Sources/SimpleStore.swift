@@ -1,7 +1,7 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
-import ReactiveAsyncSequences
+import AsyncReactiveSequences
 
 public final class SimpleStore<Value, Provider>: Sendable
 where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == Value {

@@ -1,13 +1,22 @@
 {
-  "originHash" : "56314e1a08b3332bea5285ed72384a928c0cb2e0472fa55a155835aadb507c12",
+  "originHash" : "a88edd9a95d7b717af4fa7eac4f498519970e0017c0c476364f28446552b330b",
   "pins" : [
     {
-      "identity" : "reactiveasyncsequences",
+      "identity" : "asyncreactivesequences",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pfllc/ReactiveAsyncSequences.git",
+      "location" : "https://github.com/trevorsheridan/AsyncReactiveSequences.git",
       "state" : {
         "branch" : "main",
-        "revision" : "492b24df46074727b03f9fa5744f75155709d9f3"
+        "revision" : "cb6c8834d74b93927c6775088e7a5937dc5095e9"
+      }
+    },
+    {
+      "identity" : "semaphore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/Semaphore.git",
+      "state" : {
+        "revision" : "2543679282aa6f6c8ecf2138acd613ed20790bc2",
+        "version" : "0.1.0"
       }
     },
     {
