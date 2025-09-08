@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pfllc/SwiftUtilities.git", branch: "main"),
-        .package(url: "https://github.com/trevorsheridan/AsyncReactiveSequences.git", branch: "trevor/ios26"),
+        .package(url: "https://github.com/trevorsheridan/AsyncReactiveSequences.git", .upToNextMajor(from: "0.1.0"))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
