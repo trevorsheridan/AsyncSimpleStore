@@ -1,5 +1,5 @@
 {
-  "originHash" : "66a3868cd06fead40d38067d4de50e307890dc88217571d46bb665b888a348fb",
+  "originHash" : "75e12947d87d7416641c0e0d3770c14d49cf0f797f25d229e76f1b1f8e01012b",
   "pins" : [
     {
       "identity" : "asyncreactivesequences",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pfllc/SwiftUtilities.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "4449c89d826704f7308ccd0e62ded3af896d0fba"
+        "revision" : "83ffd94f9bea294b63b6789aeabb84028e5648aa",
+        "version" : "0.1.0"
       }
     }
   ],

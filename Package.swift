@@ -13,7 +13,7 @@ let package = Package(
             targets: ["AsyncSimpleStore"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pfllc/SwiftUtilities.git", branch: "main"),
+        .package(url: "https://github.com/pfllc/SwiftUtilities.git", from: "0.1.0"),
         .package(url: "https://github.com/trevorsheridan/AsyncReactiveSequences.git", .upToNextMajor(from: "0.1.0"))
     ],
     targets: [
