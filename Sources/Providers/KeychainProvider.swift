@@ -14,6 +14,8 @@ where Value: Codable & Sendable {
     private let prefix: String
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
+    nonisolated(unsafe) private let readAttributes: [String: Any]
+    nonisolated(unsafe) private let writeAttributes: [String: Any]
     
     private var query: [String: Any] {
         [
@@ -26,15 +28,17 @@ where Value: Codable & Sendable {
         prefix + "." + identifier
     }
     
-    public init(identifier: String, prefix: String, encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
+    public init(identifier: String, prefix: String, encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder(), readAttributes: [String: Any] = [:], writeAttributes: [String: Any] = [:]) {
         self.identifier = identifier
         self.prefix = prefix
         self.encoder = encoder
         self.decoder = decoder
+        self.readAttributes = readAttributes
+        self.writeAttributes = writeAttributes
     }
     
     public func read() -> Value? {
-        let query: [String: Any] = query + [
+        let query: [String: Any] = query + readAttributes + [
             kSecMatchLimit as String: kSecMatchLimitOne,
             kSecReturnAttributes as String: true,
             kSecReturnData as String: true,
@@ -63,7 +67,7 @@ where Value: Codable & Sendable {
     
     public func write(value: Value) throws {
         do {
-            let attributes = [
+            let attributes = writeAttributes + [
                 kSecValueData as String: try encoder.encode(value)
             ]
             
