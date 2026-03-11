@@ -16,9 +16,12 @@ where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == V
     private let provider: Provider
     private let sequence = AsyncCurrentValueSequence<Value?>(nil)
     
-    public init(provider: Provider, initialValue: Value? = nil) {
+    public init(provider: Provider, initialValue: Value? = nil, read: Bool = true) {
         self.provider = provider
-        self.sequence.send(provider.read())
+        
+        if read {
+            self.sequence.send(provider.read())
+        }
         
         if let initialValue = initialValue, value == nil {
             try? write(value: initialValue)
