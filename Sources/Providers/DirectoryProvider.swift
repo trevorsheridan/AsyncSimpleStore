@@ -13,12 +13,20 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
     public let directory: D
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
-    
-    public init(filename: String, directory: D, encoder: JSONEncoder = JSONEncoder(), decoder: JSONDecoder = JSONDecoder()) {
+    nonisolated(unsafe) private let fileAttributes: [FileAttributeKey: Any]
+
+    public init(
+        filename: String,
+        directory: D,
+        encoder: JSONEncoder = JSONEncoder(),
+        decoder: JSONDecoder = JSONDecoder(),
+        fileAttributes: [FileAttributeKey: Any] = [:]
+    ) {
         self.filename = filename
         self.directory = directory
         self.encoder = encoder
         self.decoder = decoder
+        self.fileAttributes = fileAttributes
     }
     
     public func read() -> Value? {
@@ -30,7 +38,6 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
             let data = try Data(contentsOf: url)
             return try decoder.decode(Value.self, from: data)
         } catch {
-            // logger.log("unable to read data at url: \(url) reason: \(error)")
             return nil
         }
     }
@@ -43,12 +50,13 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
         do {
             let data = try encoder.encode(value)
             try data.write(to: url)
+            if !fileAttributes.isEmpty {
+                try? FileManager.default.setAttributes(fileAttributes, ofItemAtPath: url.path)
+            }
         } catch {
-            // logger.log("unable to write data at url: \(url) reason: \(error)")
             throw error
         }
         
-        // logger.log("wrote data to url: \(url)")
     }
     
     public func destroy() {
