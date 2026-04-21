@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class AnySimpleStoreProvider<Value>: StorageProviding
+public final class AnySimpleStoreProvider<Value>: BasicStorageProviding
 where Value: Sendable {
     public let provider: any StorageProviding
     private let reader: @Sendable () -> Value?

@@ -8,7 +8,7 @@
 import Foundation
 import Utilities
 
-public final class DirectoryProvider<D, Value>: StorageProviding where D: Directory & Sendable, Value: Codable {
+public final class DirectoryProvider<D, Value>: BasicStorageProviding where D: Directory & Sendable, Value: Codable {
     public let filename: String
     public let directory: D
     private let encoder: JSONEncoder

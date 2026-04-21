@@ -8,7 +8,7 @@
 import Foundation
 import Utilities
 
-public final class KeychainProvider<Value>: StorageProviding
+public final class KeychainProvider<Value>: BasicStorageProviding
 where Value: Codable & Sendable {
     private let identifier: String
     private let prefix: String
