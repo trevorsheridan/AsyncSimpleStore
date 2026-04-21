@@ -3,7 +3,7 @@ import Synchronization
 @testable import AsyncSimpleStore
 
 struct SimpleStoreTests {
-    let store = SimpleStore(provider: MockProvider(),  initialValue: 1)
+    let store = SimpleStore(provider: MockProvider(), initialValue: 1)
     
     @Test func initialValue() async throws {
         #expect(await store.value == 1)
