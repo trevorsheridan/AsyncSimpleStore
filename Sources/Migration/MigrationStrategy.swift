@@ -5,6 +5,8 @@
 //  Created by Trevor Sheridan on 4/20/26.
 //
 
+import Foundation
+
 public protocol BaseMigrationStrategy<Outgoing>: Sendable {
     associatedtype Incoming: Sendable
     associatedtype Outgoing: Sendable
@@ -33,6 +35,33 @@ extension MigrationStrategy {
         }
         
         return migrate(from: incoming)
+    }
+    
+    func migrate(version: Int, decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing {
+        let decoded = try decode(version: version, decoder: decoder)
+        return try migrate(from: decoded, version: version)
+    }
+
+    private func decode(version: Int, decoder: (any Decodable.Type) throws -> Any) throws -> Any {
+        if version == self.version {
+            return try decodeAsIncoming(decoder)
+        }
+
+        return switch prior {
+        case let prior as any MigrationStrategy<Incoming>:
+            try prior.decode(version: version, decoder: decoder)
+        case _ as RootMigrationStrategy<Incoming>:
+            try decodeAsIncoming(decoder)
+        default:
+            throw "No more migrations"
+        }
+    }
+
+    private func decodeAsIncoming(_ decoder: (any Decodable.Type) throws -> Any) throws -> Any {
+        guard let incomingType = Incoming.self as? any Decodable.Type else {
+            throw "Incoming type \(Incoming.self) must conform to Decodable to migrate from raw data."
+        }
+        return try decoder(incomingType)
     }
 }
 

@@ -29,22 +29,29 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
         self.fileAttributes = fileAttributes
     }
     
+    // MARK: - Read
+    
     public func read() -> Value? {
         read(decoder: decoder)
     }
     
-    internal func read<LocalValue: Codable>(decoder: JSONDecoder) -> LocalValue? {
-        guard let url = try? url(), FileManager.default.fileExists(atPath: url.path) else {
-            return nil
-        }
-        
+    internal func read<V: Codable>(decoder: JSONDecoder) -> V? {
         do {
-            let data = try Data(contentsOf: url)
-            return try decoder.decode(LocalValue.self, from: data)
+            guard let data: Data = read() else { return nil }
+            return try decoder.decode(V.self, from: data)
         } catch {
             return nil
         }
     }
+    
+    internal func read() -> Data? {
+        guard let url = try? url(), FileManager.default.fileExists(atPath: url.path) else {
+            return nil
+        }
+        return try? Data(contentsOf: url)
+    }
+    
+    // MARK: - Write
     
     public func write(value: Value) throws {
         try write(value: value, encoder: encoder)

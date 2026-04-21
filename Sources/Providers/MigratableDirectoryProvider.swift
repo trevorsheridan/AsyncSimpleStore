@@ -8,13 +8,20 @@
 import Foundation
 import Utilities
 
+fileprivate struct VersionedValue<V> {
+    var version: MigrationVersion
+    var value: V
+}
+
+extension VersionedValue: Decodable where V: Decodable {}
+extension VersionedValue: Encodable where V: Encodable {}
+
 public final class MigratableDirectoryProvider<D, Value>: MigratableStorageProviding where D: Directory & Sendable, Value: Codable {
-    private struct MigrationContainer: Codable {
+    private struct Version: Codable {
         var version: MigrationVersion
-        var value: Value
     }
-    
-    private let directoryProvider: DirectoryProvider<D, MigrationContainer>
+
+    private let directoryProvider: DirectoryProvider<D, VersionedValue<Value>>
     private let migration: M
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -40,23 +47,33 @@ public final class MigratableDirectoryProvider<D, Value>: MigratableStorageProvi
     }
     
     public func migrate() throws -> Value? {
-        // TODO: We need to just ensure we have a MigrationContainer, but the actual data inside of it has to be flexible. it cant be Value.
-        if let value = directoryProvider.read() {
-            // data is in the correct format for migration.
-            // TODO: I think "from" should take "data" since we need the migration to define the cast with the json decoder.
-            let migrated = try migration.migrate(from: value, version: value.version)
+        guard let data: Data = directoryProvider.read() else {
+            return nil
+        }
+
+        if let version = try? decoder.decode(Version.self, from: data).version {
+            if version == migration.version {
+                return try decoder.decode(VersionedValue<Value>.self, from: data).value
+            }
+
+            let migrated = try migration.migrate(version: version) { type in
+                try decodeValue(type: type, from: data)
+            }
+            
             try write(value: migrated)
             return migrated
         }
-        
-        if let value: Value = directoryProvider.read(decoder: decoder) {
-            // The data is correct, just need to wrap it in a container and set the
-            // version number to that of the current migration
+
+        if let value = try? decoder.decode(Value.self, from: data) {
             try write(value: value)
+            return value
         }
-        
-        // The data was unable to be migrated or is not able to be read as the expected value.
+
         return nil
+    }
+
+    private func decodeValue<V: Decodable>(type: V.Type, from data: Data) throws -> V {
+        try decoder.decode(VersionedValue<V>.self, from: data).value
     }
     
     public func read() -> Value? {
