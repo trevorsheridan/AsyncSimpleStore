@@ -37,9 +37,11 @@ final class MockMigratableProvider<Value, V, M>: MigratableStorageProviding wher
     }
 
     @discardableResult
-    func migrate() throws -> Value? {
-        let migrated = try migration.migrate(from: simulatedCachedData.value, schemaVersion: simulatedCachedData.schemaVersion)
-        try write(value: migrated)
+    func migrate() -> Value? {
+        guard let migrated = try? migration.migrate(from: simulatedCachedData.value, schemaVersion: simulatedCachedData.schemaVersion) else {
+            return nil
+        }
+        try? write(value: migrated)
         return migrated
     }
 }

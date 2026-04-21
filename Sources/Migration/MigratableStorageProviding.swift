@@ -8,5 +8,5 @@
 public protocol MigratableStorageProviding: StorageProviding {
     associatedtype M: BaseMigrationStrategy where M.Outgoing == Value
     @discardableResult
-    func migrate() throws -> Value?
+    func migrate() -> Value?
 }

@@ -38,13 +38,15 @@ final class MockDecoderMigratableProvider<Value, M>: MigratableStorageProviding 
     }
 
     @discardableResult
-    func migrate() throws -> Value? {
+    func migrate() -> Value? {
         let data = Data(simulatedCachedData.json.utf8)
         let decoder = JSONDecoder()
-        let value = try migration.migrate(schemaVersion: simulatedCachedData.schemaVersion) { type in
+        guard let value = try? migration.migrate(schemaVersion: simulatedCachedData.schemaVersion, decoder: { type in
             try decodeEnvelope(type: type, from: data, decoder: decoder)
+        }) else {
+            return nil
         }
-        try write(value: value)
+        try? write(value: value)
         return value
     }
 }

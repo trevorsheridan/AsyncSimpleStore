@@ -15,7 +15,7 @@ where Value: Sendable {
     private let reader: @Sendable () -> Value?
     private let writer: @Sendable (_ value: Value) throws -> Void
     private let destroyer: @Sendable () -> Void
-    private let migrator: @Sendable () throws -> Value?
+    private let migrator: @Sendable () -> Value?
 
     public init<Provider>(_ provider: Provider)
     where Provider: MigratableStorageProviding, Provider.Value == Value {
@@ -39,7 +39,7 @@ where Value: Sendable {
     }
 
     @discardableResult
-    public func migrate() throws -> Value? {
-        try migrator()
+    public func migrate() -> Value? {
+        migrator()
     }
 }

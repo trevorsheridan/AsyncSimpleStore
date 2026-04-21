@@ -46,21 +46,23 @@ public final class MigratableDirectoryProvider<D, Value, M>: MigratableStoragePr
         self.migration = migration
     }
     
-    public func migrate() throws -> Value? {
+    public func migrate() -> Value? {
         guard let data: Data = directoryProvider.read() else {
             return nil
         }
-
+        
         if let schemaVersion = try? decoder.decode(SchemaVersion.self, from: data).schemaVersion {
             if schemaVersion == migration.schemaVersion {
-                return try decoder.decode(ValueEnvelope<Value>.self, from: data).value
+                return try? decoder.decode(ValueEnvelope<Value>.self, from: data).value
             }
 
-            let migrated = try migration.migrate(schemaVersion: schemaVersion) { type in
+            guard let migrated = try? migration.migrate(schemaVersion: schemaVersion, decoder: { type in
                 try decodeValue(type: type, from: data)
+            }) else {
+                return nil
             }
-
-            try write(value: migrated)
+            
+            try? write(value: migrated)
 
             return migrated
         }
@@ -73,10 +75,10 @@ public final class MigratableDirectoryProvider<D, Value, M>: MigratableStoragePr
         // the moment we switch to MigratableDirectoryProvider; the data on
         // disk at that moment is, by definition, the current Value shape.
         if let value = try? decoder.decode(Value.self, from: data) {
-            try write(value: value)
+            try? write(value: value)
             return value
         }
-
+        
         return nil
     }
 
