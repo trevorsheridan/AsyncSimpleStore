@@ -8,20 +8,20 @@
 import Foundation
 import Utilities
 
-fileprivate struct VersionedValue<V> {
-    var version: MigrationVersion
+fileprivate struct ValueEnvelope<V> {
+    var schemaVersion: MigrationVersion
     var value: V
 }
 
-extension VersionedValue: Decodable where V: Decodable {}
-extension VersionedValue: Encodable where V: Encodable {}
+extension ValueEnvelope: Decodable where V: Decodable {}
+extension ValueEnvelope: Encodable where V: Encodable {}
 
 public final class MigratableDirectoryProvider<D, Value, M>: MigratableStorageProviding where D: Directory & Sendable, Value: Codable, M: BaseMigrationStrategy, M.Outgoing == Value {
-    private struct Version: Codable {
-        var version: MigrationVersion
+    private struct SchemaVersion: Codable {
+        var schemaVersion: MigrationVersion
     }
 
-    private let directoryProvider: DirectoryProvider<D, VersionedValue<Value>>
+    private let directoryProvider: DirectoryProvider<D, ValueEnvelope<Value>>
     private let migration: M
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -51,12 +51,12 @@ public final class MigratableDirectoryProvider<D, Value, M>: MigratableStoragePr
             return nil
         }
 
-        if let version = try? decoder.decode(Version.self, from: data).version {
-            if version == migration.version {
-                return try decoder.decode(VersionedValue<Value>.self, from: data).value
+        if let schemaVersion = try? decoder.decode(SchemaVersion.self, from: data).schemaVersion {
+            if schemaVersion == migration.schemaVersion {
+                return try decoder.decode(ValueEnvelope<Value>.self, from: data).value
             }
 
-            let migrated = try migration.migrate(version: version) { type in
+            let migrated = try migration.migrate(schemaVersion: schemaVersion) { type in
                 try decodeValue(type: type, from: data)
             }
 
@@ -81,7 +81,7 @@ public final class MigratableDirectoryProvider<D, Value, M>: MigratableStoragePr
     }
 
     private func decodeValue<V: Decodable>(type: V.Type, from data: Data) throws -> V {
-        try decoder.decode(VersionedValue<V>.self, from: data).value
+        try decoder.decode(ValueEnvelope<V>.self, from: data).value
     }
     
     public func read() -> Value? {
@@ -91,7 +91,7 @@ public final class MigratableDirectoryProvider<D, Value, M>: MigratableStoragePr
     public func write(value: Value) throws {
         try directoryProvider.write(
             value: .init(
-                version: migration.version,
+                schemaVersion: migration.schemaVersion,
                 value: value
             )
         )

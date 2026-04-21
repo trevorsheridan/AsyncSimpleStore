@@ -11,7 +11,7 @@ import Synchronization
 
 final class MockDecoderMigratableProvider<Value, M>: MigratableStorageProviding where Value: Sendable, M: BaseMigrationStrategy, M.Outgoing == Value {
     struct SimulatedCachedData {
-        var version: Int
+        var schemaVersion: Int
         var json: String
     }
 
@@ -41,7 +41,7 @@ final class MockDecoderMigratableProvider<Value, M>: MigratableStorageProviding 
     func migrate() throws -> Value? {
         let data = Data(simulatedCachedData.json.utf8)
         let decoder = JSONDecoder()
-        let value = try migration.migrate(version: simulatedCachedData.version) { type in
+        let value = try migration.migrate(schemaVersion: simulatedCachedData.schemaVersion) { type in
             try decodeEnvelope(type: type, from: data, decoder: decoder)
         }
         try write(value: value)

@@ -11,8 +11,8 @@ import Synchronization
 @testable import AsyncSimpleStore
 
 struct MockMigrationV1ToV2: MigrationStrategy<Int?> {
-    let version: Int = 2
-    let prior = RootMigrationStrategy<String>(version: 1)
+    let schemaVersion: Int = 2
+    let prior = RootMigrationStrategy<String>(schemaVersion: 1)
 
     func migrate(from: String) -> Int? {
         from == "one" ? 1 : nil
@@ -20,7 +20,7 @@ struct MockMigrationV1ToV2: MigrationStrategy<Int?> {
 }
 
 struct MockMigrationV2ToV3: MigrationStrategy<Int> {
-    let version: Int = 3
+    let schemaVersion: Int = 3
     let prior = MockMigrationV1ToV2()
 
     func migrate(from: Int?) -> Int {
@@ -39,7 +39,7 @@ struct MigrationTests {
                 store = try SimpleStore(
                     provider: MockMigratableProvider<Int, String, MockMigrationV2ToV3>(
                         simulatedCachedData: .init(
-                            version: 1,
+                            schemaVersion: 1,
                             value: "one"
                         ),
                         migration: MockMigrationV2ToV3()
@@ -60,7 +60,7 @@ struct MigrationTests {
                 store = try SimpleStore(
                     provider: MockMigratableProvider<Int, Int?, MockMigrationV2ToV3>(
                         simulatedCachedData: .init(
-                            version: 2,
+                            schemaVersion: 2,
                             value: 1
                         ),
                         migration: MockMigrationV2ToV3()
@@ -83,7 +83,7 @@ struct MigrationTests {
                     try SimpleStore(
                         provider: MockMigratableProvider<Int, String, MockMigrationV2ToV3>(
                             simulatedCachedData: .init(
-                                version: 99,
+                                schemaVersion: 99,
                                 value: "anything"
                             ),
                             migration: MockMigrationV2ToV3()
@@ -105,10 +105,10 @@ struct MigrationTests {
                 store = try SimpleStore(
                     provider: MockMigratableProvider<String, String, RootMigrationStrategy<String>>(
                         simulatedCachedData: .init(
-                            version: 1,
+                            schemaVersion: 1,
                             value: "one"
                         ),
-                        migration: RootMigrationStrategy<String>(version: 1)
+                        migration: RootMigrationStrategy<String>(schemaVersion: 1)
                     ),
                     initialValue: "one"
                 )
@@ -131,8 +131,8 @@ struct MigrationTests {
                 store = try SimpleStore(
                     provider: MockDecoderMigratableProvider<Int, MockMigrationV2ToV3>(
                         simulatedCachedData: .init(
-                            version: 1,
-                            json: #"{"version":1,"value":"one"}"#
+                            schemaVersion: 1,
+                            json: #"{"schemaVersion":1,"value":"one"}"#
                         ),
                         migration: MockMigrationV2ToV3()
                     ),
@@ -155,8 +155,8 @@ struct MigrationTests {
                 store = try SimpleStore(
                     provider: MockDecoderMigratableProvider<Int, MockMigrationV2ToV3>(
                         simulatedCachedData: .init(
-                            version: 2,
-                            json: #"{"version":2,"value":1}"#
+                            schemaVersion: 2,
+                            json: #"{"schemaVersion":2,"value":1}"#
                         ),
                         migration: MockMigrationV2ToV3()
                     ),
@@ -178,8 +178,8 @@ struct MigrationTests {
                     try SimpleStore(
                         provider: MockDecoderMigratableProvider<Int, MockMigrationV2ToV3>(
                             simulatedCachedData: .init(
-                                version: 99,
-                                json: #"{"version":99,"value":"anything"}"#
+                                schemaVersion: 99,
+                                json: #"{"schemaVersion":99,"value":"anything"}"#
                             ),
                             migration: MockMigrationV2ToV3()
                         ),
@@ -199,10 +199,10 @@ struct MigrationTests {
                 store = try SimpleStore(
                     provider: MockDecoderMigratableProvider<String, RootMigrationStrategy<String>>(
                         simulatedCachedData: .init(
-                            version: 1,
-                            json: #"{"version":1,"value":"one"}"#
+                            schemaVersion: 1,
+                            json: #"{"schemaVersion":1,"value":"one"}"#
                         ),
-                        migration: RootMigrationStrategy<String>(version: 1)
+                        migration: RootMigrationStrategy<String>(schemaVersion: 1)
                     ),
                     initialValue: "one"
                 )

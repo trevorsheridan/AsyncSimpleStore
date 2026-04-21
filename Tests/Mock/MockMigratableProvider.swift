@@ -10,7 +10,7 @@ import Synchronization
 
 final class MockMigratableProvider<Value, V, M>: MigratableStorageProviding where Value: Sendable, V: Sendable, M: BaseMigrationStrategy, M.Outgoing == Value {
     struct SimulatedCachedData {
-        var version: Int
+        var schemaVersion: Int
         var value: V
     }
 
@@ -38,7 +38,7 @@ final class MockMigratableProvider<Value, V, M>: MigratableStorageProviding wher
 
     @discardableResult
     func migrate() throws -> Value? {
-        let migrated = try migration.migrate(from: simulatedCachedData.value, version: simulatedCachedData.version)
+        let migrated = try migration.migrate(from: simulatedCachedData.value, schemaVersion: simulatedCachedData.schemaVersion)
         try write(value: migrated)
         return migrated
     }
