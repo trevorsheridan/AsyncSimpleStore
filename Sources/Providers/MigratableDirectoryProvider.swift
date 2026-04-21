@@ -16,7 +16,7 @@ fileprivate struct VersionedValue<V> {
 extension VersionedValue: Decodable where V: Decodable {}
 extension VersionedValue: Encodable where V: Encodable {}
 
-public final class MigratableDirectoryProvider<D, Value>: MigratableStorageProviding where D: Directory & Sendable, Value: Codable {
+public final class MigratableDirectoryProvider<D, Value, M>: MigratableStorageProviding where D: Directory & Sendable, Value: Codable, M: BaseMigrationStrategy, M.Outgoing == Value {
     private struct Version: Codable {
         var version: MigrationVersion
     }
@@ -59,11 +59,19 @@ public final class MigratableDirectoryProvider<D, Value>: MigratableStorageProvi
             let migrated = try migration.migrate(version: version) { type in
                 try decodeValue(type: type, from: data)
             }
-            
+
             try write(value: migrated)
+
             return migrated
         }
 
+        // One-shot upgrade from the non-versioned DirectoryProvider: if the
+        // bytes already decode as the current Value, wrap them in the version
+        // envelope on write. Older unwrapped formats cannot be migrated from
+        // here — there is no tag to indicate which strategy's Incoming to
+        // decode as. This is acceptable because migration starts being used at
+        // the moment we switch to MigratableDirectoryProvider; the data on
+        // disk at that moment is, by definition, the current Value shape.
         if let value = try? decoder.decode(Value.self, from: data) {
             try write(value: value)
             return value

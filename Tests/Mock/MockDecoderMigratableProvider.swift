@@ -9,7 +9,7 @@ import Foundation
 import Synchronization
 @testable import AsyncSimpleStore
 
-final class MockDecoderMigratableProvider<Value>: MigratableStorageProviding where Value: Sendable {
+final class MockDecoderMigratableProvider<Value, M>: MigratableStorageProviding where Value: Sendable, M: BaseMigrationStrategy, M.Outgoing == Value {
     struct SimulatedCachedData {
         var version: Int
         var json: String

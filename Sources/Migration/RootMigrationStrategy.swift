@@ -6,6 +6,12 @@
 //
 
 public struct RootMigrationStrategy<Outgoing>: BaseMigrationStrategy {
+    public let version: MigrationVersion
+
+    public init(version: MigrationVersion) {
+        self.version = version
+    }
+
     public func migrate(from: Outgoing) -> Outgoing {
         from
     }
