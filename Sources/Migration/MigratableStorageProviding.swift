@@ -1,12 +1,12 @@
 //
-//  MigratableStorage.swift
+//  MigratableStorageProviding.swift
 //  AsyncSimpleStore
 //
 //  Created by Trevor Sheridan on 4/20/26.
 //
 
-public protocol MigratableStorage: StorageProviding {
+public protocol MigratableStorageProviding: StorageProviding {
     associatedtype M = MigrationStrategy<Value>
     @discardableResult
-    func migrate() throws -> Value
+    func migrate() throws -> Value?
 }

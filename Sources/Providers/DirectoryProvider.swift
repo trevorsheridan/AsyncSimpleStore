@@ -30,19 +30,27 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
     }
     
     public func read() -> Value? {
+        read(decoder: decoder)
+    }
+    
+    internal func read<LocalValue: Codable>(decoder: JSONDecoder) -> LocalValue? {
         guard let url = try? url(), FileManager.default.fileExists(atPath: url.path) else {
             return nil
         }
         
         do {
             let data = try Data(contentsOf: url)
-            return try decoder.decode(Value.self, from: data)
+            return try decoder.decode(LocalValue.self, from: data)
         } catch {
             return nil
         }
     }
     
     public func write(value: Value) throws {
+        try write(value: value, encoder: encoder)
+    }
+    
+    internal func write<LocalValue: Codable>(value: LocalValue, encoder: JSONEncoder) throws {
         guard let url = try? url(createOptions: .createDirectory) else {
             return
         }
@@ -50,13 +58,13 @@ public final class DirectoryProvider<D, Value>: StorageProviding where D: Direct
         do {
             let data = try encoder.encode(value)
             try data.write(to: url)
+            
             if !fileAttributes.isEmpty {
                 try? FileManager.default.setAttributes(fileAttributes, ofItemAtPath: url.path)
             }
         } catch {
             throw error
         }
-        
     }
     
     public func destroy() {

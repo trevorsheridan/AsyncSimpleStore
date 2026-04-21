@@ -28,12 +28,15 @@ where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == V
         }
     }
     
-    public init(provider: Provider, initialValue: Value? = nil) throws where Provider: MigratableStorage {
+    public init(provider: Provider, initialValue: Value? = nil, read: Bool = true) throws where Provider: MigratableStorageProviding {
         self.provider = provider
         
         // Ask the provider to migrate the data!
         try provider.migrate()
-        self.sequence.send(provider.read())
+        
+        if read {
+            self.sequence.send(provider.read())
+        }
         
         if let initialValue = initialValue, value == nil {
             try? write(value: initialValue)

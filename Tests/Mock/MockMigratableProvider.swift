@@ -8,7 +8,7 @@
 import Synchronization
 @testable import AsyncSimpleStore
 
-final class MockMigratableProvider<Value>: MigratableStorage where Value: Sendable {
+final class MockMigratableProvider<Value>: MigratableStorageProviding where Value: Sendable {
     struct SimulatedCachedData {
         var version: Int
         var value: String
@@ -45,7 +45,7 @@ final class MockMigratableProvider<Value>: MigratableStorage where Value: Sendab
     }
     
     @discardableResult
-    func migrate() throws -> Value {
+    func migrate() throws -> Value? {
         // Mock reading in an initial value by using the v1Value.
         let value = try migration.migrate(from: simulatedCachedData.value, version: simulatedCachedData.version)
         // It's up to the actual provider implementation to determine how to store the version information.
