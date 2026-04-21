@@ -8,7 +8,7 @@
 import Synchronization
 @testable import AsyncSimpleStore
 
-final class MockProvider<Value>: StorageProviding where Value: Sendable {
+final class MockProvider<Value>: BasicStorageProviding where Value: Sendable {
     private let value: Mutex<Value?>
     
     init(_ value: Value? = nil) {
