@@ -28,7 +28,7 @@ where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == V
         }
     }
     
-    public init(provider: Provider, initialValue: Value) where Provider: MigratableStorageProviding {
+    public init(migratableProvider provider: Provider, initialValue: Value) where Provider: MigratableStorageProviding {
         self.provider = provider
         
         // Ask the provider to migrate the data!
