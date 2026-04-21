@@ -16,7 +16,7 @@ where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == V
     private let provider: Provider
     private let sequence = AsyncCurrentValueSequence<Value?>(nil)
     
-    public init(provider: Provider, initialValue: Value? = nil, read: Bool = true) {
+    public init(provider: Provider, initialValue: Value? = nil, read: Bool = true) where Provider: BasicStorageProviding {
         self.provider = provider
         
         if read {
@@ -25,6 +25,19 @@ where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == V
         
         if let initialValue = initialValue, value == nil {
             try? write(value: initialValue)
+        }
+    }
+    
+    public init(provider: Provider, initialValue: Value) where Provider: MigratableStorageProviding {
+        self.provider = provider
+        
+        // Ask the provider to migrate the data!
+        let value = provider.migrate()
+        
+        if value == nil {
+            try? write(value: initialValue)
+        } else {
+            self.sequence.send(provider.read())
         }
     }
     
