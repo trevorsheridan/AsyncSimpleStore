@@ -4,7 +4,7 @@
 import AsyncReactiveSequences
 
 public final class SimpleStore<Value, Provider>: Sendable
-where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == Value {
+where Value: Codable & Sendable, Provider: BaseStorageProviding, Provider.Value == Value {
     public var value: Value? {
         sequence.value
     }
