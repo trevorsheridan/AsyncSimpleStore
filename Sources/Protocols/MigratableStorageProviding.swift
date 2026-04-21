@@ -5,7 +5,7 @@
 //  Created by Trevor Sheridan on 4/20/26.
 //
 
-public protocol MigratableStorageProviding: BaseStorageProviding {
+public protocol MigratableStorageProviding: StorageProviding {
     associatedtype M: BaseMigrationStrategy where M.Outgoing == Value
     @discardableResult
     func migrate() -> Value?

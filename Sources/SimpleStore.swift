@@ -4,7 +4,7 @@
 import AsyncReactiveSequences
 
 public final class SimpleStore<Value, Provider>: Sendable
-where Value: Codable & Sendable, Provider: BaseStorageProviding, Provider.Value == Value {
+where Value: Codable & Sendable, Provider: StorageProviding, Provider.Value == Value {
     public var value: Value? {
         sequence.value
     }
@@ -16,7 +16,7 @@ where Value: Codable & Sendable, Provider: BaseStorageProviding, Provider.Value 
     private let provider: Provider
     private let sequence = AsyncCurrentValueSequence<Value?>(nil)
     
-    public init(provider: Provider, initialValue: Value? = nil, read: Bool = true) where Provider: StorageProviding {
+    public init(provider: Provider, initialValue: Value? = nil, read: Bool = true) where Provider: BasicStorageProviding {
         self.provider = provider
         
         if read {
