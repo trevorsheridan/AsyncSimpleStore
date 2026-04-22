@@ -9,13 +9,13 @@ import Foundation
 
 public final class AnySimpleStoreProvider<Value>: BasicStorageProviding
 where Value: Sendable {
-    public let provider: any StorageProviding
+    public let provider: any BasicStorageProviding
     private let reader: @Sendable () -> Value?
     private let writer: @Sendable (_ value: Value) throws -> Void
     private let destroyer: @Sendable () -> Void
     
     public init<Provider>(_ provider: Provider)
-    where Provider: StorageProviding, Provider.Value == Value {
+    where Provider: BasicStorageProviding, Provider.Value == Value {
         self.provider = provider
         self.reader = provider.read
         self.writer = provider.write
