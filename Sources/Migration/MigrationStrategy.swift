@@ -48,6 +48,13 @@ public protocol BaseMigrationStrategy<Outgoing>: Sendable {
     /// ``MigrationStrategy`` can override with a chain-walk decoder and
     /// leaves get the trivial default.
     func migrate(schemaVersion: MigrationVersion, decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing
+
+    /// Dispatch entry point for raw bytes whose version is **unknown** —
+    /// pre-versioning data that carries no tag. The chain tries to decode the
+    /// bytes as its own `Incoming` and, failing that, walks back to the prior,
+    /// repeating until some level decodes; it then migrates forward from there.
+    /// A leaf can only try its own `Incoming`, since it has no prior.
+    func migrateUntagged(decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing
 }
 
 /// A migration step that has a `prior`, forming a chain.
@@ -73,11 +80,28 @@ extension BaseMigrationStrategy {
         return migrate(from: from)
     }
 
+    // Decodes the bytes as this strategy's Incoming, returned type-erased.
+    // fileprivate so the chain walk in MigrationStrategy's extension shares it.
+    fileprivate func decodeAsIncoming(_ decoder: (any Decodable.Type) throws -> Any) throws -> Any {
+        guard let incomingType = Incoming.self as? any Decodable.Type else {
+            throw "Incoming type \(Incoming.self) must conform to Decodable to migrate from raw data."
+        }
+
+        return try decoder(incomingType)
+    }
+
+    // Decodes the bytes as this strategy's Incoming and applies its migration
+    // step. A leaf has no prior to walk back to, so both by-version and untagged
+    // dispatch reduce to this — the bytes can only be its own Incoming.
+    private func decodeIncomingAndMigrate(_ decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing {
+        try migrate(from: try decodeAsIncoming(decoder))
+    }
+
     // MARK: - Leaf defaults
     //
     // These are the witnesses for non-chained strategies (Root). They trust
     // that the caller has the right shape already — there's no prior to walk
-    // back to. `MigrationStrategy`'s extension below overrides both for
+    // back to. `MigrationStrategy`'s extension below overrides each for
     // conformers that do have a chain.
 
     public func migrate(from: Any, schemaVersion: MigrationVersion) throws -> Outgoing {
@@ -85,14 +109,27 @@ extension BaseMigrationStrategy {
     }
 
     public func migrate(schemaVersion: MigrationVersion, decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing {
-        guard let incomingType = Incoming.self as? any Decodable.Type else {
-            throw "Incoming type \(Incoming.self) must conform to Decodable to migrate from raw data."
-        }
-        return try migrate(from: try decoder(incomingType))
+        try decodeIncomingAndMigrate(decoder)
+    }
+
+    public func migrateUntagged(decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing {
+        try decodeIncomingAndMigrate(decoder)
     }
 }
 
 extension MigrationStrategy {
+    // Chain walk for untagged (versionless) bytes: try to decode them as my own
+    // Incoming and migrate; if that fails, the bytes predate me, so let the prior
+    // bring them up to my Incoming first, then migrate forward. The recursion
+    // bottoms out at the root leaf.
+    public func migrateUntagged(decoder: (any Decodable.Type) throws -> Any) throws -> Outgoing {
+        if let incoming = try? decodeAsIncoming(decoder) {
+            return try migrate(from: incoming)
+        }
+
+        return try migrate(from: prior.migrateUntagged(decoder: decoder))
+    }
+
     // Chain walk for pre-decoded values. The match condition —
     // `prior.schemaVersion == schemaVersion` — means "my prior produced this
     // version, so the data is in my Incoming form; apply me." Everything
@@ -131,12 +168,5 @@ extension MigrationStrategy {
         }
 
         return try prior.decode(schemaVersion: schemaVersion, decoder: decoder)
-    }
-
-    private func decodeAsIncoming(_ decoder: (any Decodable.Type) throws -> Any) throws -> Any {
-        guard let incomingType = Incoming.self as? any Decodable.Type else {
-            throw "Incoming type \(Incoming.self) must conform to Decodable to migrate from raw data."
-        }
-        return try decoder(incomingType)
     }
 }

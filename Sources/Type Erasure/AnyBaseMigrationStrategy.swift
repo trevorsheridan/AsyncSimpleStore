@@ -11,8 +11,8 @@ import Foundation
 ///
 /// Use this to hide the specific migration chain behind a uniform type — for
 /// instance, as the `M` of a type-erased provider. The box delegates the
-/// dispatch methods (`migrate(from:schemaVersion:)` and
-/// `migrate(schemaVersion:decoder:)`) to the underlying strategy. Its own
+/// dispatch methods (`migrate(from:schemaVersion:)`, `migrate(schemaVersion:decoder:)`
+/// and `migrateUntagged(decoder:)`) to the underlying strategy. Its own
 /// `Incoming` collapses to `Value`, and the primitive
 /// `migrate(from: Value) -> Value` is identity — callers migrating old data
 /// must go through the dispatch methods.
@@ -23,12 +23,14 @@ public struct AnyBaseMigrationStrategy<Value>: BaseMigrationStrategy where Value
     public let schemaVersion: MigrationVersion
     private let valueMigrator: @Sendable (Any, MigrationVersion) throws -> Value
     private let decoderMigrator: @Sendable (MigrationVersion, (any Decodable.Type) throws -> Any) throws -> Value
+    private let untaggedMigrator: @Sendable ((any Decodable.Type) throws -> Any) throws -> Value
 
     public init<Strategy>(_ strategy: Strategy)
     where Strategy: BaseMigrationStrategy, Strategy.Outgoing == Value {
         self.schemaVersion = strategy.schemaVersion
         self.valueMigrator = { try strategy.migrate(from: $0, schemaVersion: $1) }
         self.decoderMigrator = { try strategy.migrate(schemaVersion: $0, decoder: $1) }
+        self.untaggedMigrator = { try strategy.migrateUntagged(decoder: $0) }
     }
 
     public func migrate(from: Value) -> Value {
@@ -41,5 +43,9 @@ public struct AnyBaseMigrationStrategy<Value>: BaseMigrationStrategy where Value
 
     public func migrate(schemaVersion: MigrationVersion, decoder: (any Decodable.Type) throws -> Any) throws -> Value {
         try decoderMigrator(schemaVersion, decoder)
+    }
+
+    public func migrateUntagged(decoder: (any Decodable.Type) throws -> Any) throws -> Value {
+        try untaggedMigrator(decoder)
     }
 }
