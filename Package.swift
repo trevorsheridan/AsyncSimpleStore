@@ -28,7 +28,10 @@ let package = Package(
         ),
         .testTarget(
             name: "AsyncSimpleStoreTests",
-            dependencies: ["AsyncSimpleStore"]
+            dependencies: [
+                "AsyncSimpleStore",
+                .product(name: "Utilities", package: "SwiftUtilities"),
+            ]
         ),
     ],
     swiftLanguageModes: [.v6]
